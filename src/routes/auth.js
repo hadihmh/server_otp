@@ -3,19 +3,11 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../model/Users");
 const { generateOTP, sendOTP } = require("../util/otp");
-const {DynaEmailSender} = require ("dyna-email-sender");
 
 router.post("/generate-otp", async (req, res) => {
   const email = req.body.email;
-  const sender = new DynaEmailSender({
-    host: 'smtp.gmail.com',
-    port: 587,
-    ssl: true,
-    username: 'hmhnexus5x@gmail.com',
-    password: 'qyozoqbbpualulho',
-    allowInvalidCertificates: true,
-  });
-  console.log(email);
+  
+  // console.log(email);
   try {
     let user = await User.findOne({ email: email });
 
@@ -23,46 +15,39 @@ router.post("/generate-otp", async (req, res) => {
     if (!user) {
       user = new User({ email: email });
     }
-    await sender.send({
-      fromTitle: 'Info My Company 👻',       
-      fromAddress: 'hmhnexus5x@gamil.com',    
-      toAddress: 'hadi.mahmudi74@gmail.com',             // or array of addresses
-      subject: 'Hello ✔', 
-      text: 'Hello world?',
-      html: '<b>Hello world?</b>',
-    });
-    res.status(200).send("OTP sent successfully")
+    
+    
     
     // If user is blocked, return an error
-    // if (user.isBlocked) {
-    //   const currentTime = new Date();
-    //   if (currentTime < user.blockUntil) {
-    //     return res.status(403).send("Account blocked. Try after some time.");
-    //   } else {
-    //     user.isBlocked = false;
-    //     user.OTPAttempts = 0;
-    //   }
-    // }
+    if (user.isBlocked) {
+      const currentTime = new Date();
+      if (currentTime < user.blockUntil) {
+        return res.status(403).send("Account blocked. Try after some time.");
+      } else {
+        user.isBlocked = false;
+        user.OTPAttempts = 0;
+      }
+    }
 
-    // // Check for minimum 1-minute gap between OTP requests
-    // const lastOTPTime = user.OTPCreatedTime;
-    // const currentTime = new Date();
+    // Check for minimum 1-minute gap between OTP requests
+    const lastOTPTime = user.OTPCreatedTime;
+    const currentTime = new Date();
 
-    // if (lastOTPTime && currentTime - lastOTPTime < 60000) {
-    //   return res
-    //     .status(403)
-    //     .send("Minimum 1-minute gap required between OTP requests");
-    // }
+    if (lastOTPTime && currentTime - lastOTPTime < 60000) {
+      return res
+        .status(403)
+        .send("Minimum 1-minute gap required between OTP requests");
+    }
 
-    // const OTP = generateOTP();
-    // user.OTP = OTP;
-    // user.OTPCreatedTime = currentTime;
+    const OTP = generateOTP();
+    user.OTP = OTP;
+    user.OTPCreatedTime = currentTime;
 
-    // await user.save();
+    await user.save();
 
-    // sendOTP(email, OTP);
+    await sendOTP(email, OTP);
 
-    // res.status(200).send("OTP sent successfully");
+    res.status(200).send("OTP sent successfully");
   } catch (err) {
     console.log(err);
     res.status(500).send("Server error");
