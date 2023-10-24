@@ -6,7 +6,7 @@ const { generateOTP, sendOTP } = require("../util/otp");
 
 router.post("/generate-otp", async (req, res) => {
   const email = req.body.email;
-
+  console.log(email);
   try {
     let user = await User.findOne({ email: email });
 
@@ -94,7 +94,7 @@ router.post("/login", async (req, res) => {
     const OTPCreatedTime = user.OTPCreatedTime;
     const currentTime = new Date();
 
-    if (currentTime - OTPCreatedTime > 5 * 60 * 1000) {
+    if (currentTime - OTPCreatedTime > 3 * 60 * 1000) {
       return res.status(403).send("OTP expired");
     }
 
