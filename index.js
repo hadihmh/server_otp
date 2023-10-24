@@ -11,6 +11,7 @@ app.use("/auth", authRoutes);
 app.get("/", (req, res) => {
   res.send("This API is running live🥳");
 });
+console.log(process.env.DB_CONNECTION_STRING);
 
 mongoose
   .connect(`${process.env.DB_CONNECTION_STRING}`, {
