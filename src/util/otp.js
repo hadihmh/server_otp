@@ -1,9 +1,9 @@
-const crypto = require("crypto");
 const {DynaEmailSender} = require ("dyna-email-sender");
 
 
 const generateOTP = () => {
-  return crypto.randomBytes(3).toString("hex");
+  let random=Math.floor(Math.random()*90000) + 10000;
+  return random.toString();
 };
 
 const sendOTP = async (email, OTP) => {
