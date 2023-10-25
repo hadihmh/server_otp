@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
       return res.status(403).send("Invalid OTP");
     }
 
-    // Check if OTP is within 5 minutes
+    // Check if OTP is within 3 minutes
     const OTPCreatedTime = user.OTPCreatedTime;
     const currentTime = new Date();
 
