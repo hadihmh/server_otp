@@ -110,6 +110,7 @@ router.post("/login", async (req, res) => {
     user.OTP = undefined;
     user.OTPCreatedTime = undefined;
     user.OTPAttempts = 0;
+    user.token=token;
 
     await user.save();
     res.json({ token });
