@@ -136,7 +136,7 @@ router.post("/verify", async (req, res) => {
     user.token = token;
 
     await user.save();
-    res.json({ token });
+    res.json({status: 200, message: "token created","token":token });
     console.log("User logged in successfully");
   } catch (err) {
     console.log(err);
